@@ -1,0 +1,8 @@
+# 依赖（已在 Python 3.12 + torch 2.3.1 / torchvision 0.18.1 下验证）
+torch>=2.0
+torchvision>=0.15
+numpy>=1.24
+pandas>=2.0
+opencv-python>=4.8
+Pillow>=10.0
+PyYAML>=6.0

@@ -1,0 +1,41 @@
+# 第一轮：48×48 小型残差基线（报告 3.1 / 表 1 第一行）
+# 35 轮、batch 256、AdamW lr 3e-3、weight decay 5e-4、Dropout 0.25、无 MixUp。
+exp:
+  name: r1_baseline
+  seed: 42
+  notes: "FerResNet: 3x3 stem + 4 residual stages, 2 blocks each"
+
+data:
+  root: fer_data/fer_data
+  img_size: 48
+  val_size: 2848
+  holdout_size: 2836
+  num_workers: 4
+
+aug:
+  strength: 1.0
+  rotation: 12.0
+  scale: [0.90, 1.00]
+  hflip: 0.5
+  brightness: 0.20
+  contrast: 0.20
+  erasing:
+    enabled: false
+
+model:
+  name: ferresnet
+  pretrained: false
+  dropout: 0.25
+  in_ch: 1
+
+train:
+  epochs: 35
+  batch_size: 256
+  lr: 0.003
+  weight_decay: 0.0005
+  warmup_epochs: 1
+  label_smoothing: 0.0
+  mixup_prob: 0.0
+  ema_decay: 0.0
+  amp: true
+  refit_epochs: 8

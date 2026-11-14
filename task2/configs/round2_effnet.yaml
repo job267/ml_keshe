@@ -1,0 +1,33 @@
+# 第二轮 B：EfficientNet-B0，160px，32 轮（报告表 1）
+# 分类头学习率 ×5、标签平滑 0.05、MixUp p=0.45；单模型 68.47% / Macro F1 0.6658，
+# 但作为第三成员使融合从 70.22% 提升到 72.40%——"单模型强弱 ≠ 组合价值"。
+exp:
+  name: r2_b0
+  seed: 20261011
+  notes: "efficientnet_b0, 160px, head lr x5, ls 0.05, mixup 0.45"
+
+data:
+  root: fer_data/fer_data
+  img_size: 160
+  val_size: 2848
+  holdout_size: 0
+  grayscale_to_rgb: true
+
+model:
+  name: efficientnet_b0
+  pretrained: true
+  dropout: 0.2
+  head_lr_mult: 5.0
+  in_ch: 3
+
+train:
+  epochs: 32
+  batch_size: 96
+  lr: 0.00015
+  weight_decay: 0.02
+  warmup_epochs: 1
+  label_smoothing: 0.05
+  mixup_prob: 0.45
+  mixup_alpha: 0.2
+  amp: true
+  refit_epochs: 8

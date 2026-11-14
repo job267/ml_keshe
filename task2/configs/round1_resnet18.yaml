@@ -1,0 +1,28 @@
+# 第一轮 C：ImageNet 预训练 ResNet18（TorchVision），灰度复制为三通道
+# 报告 4.1：68.43% → 正则化后 68.68%，与 FERResNet 构成 50/50 融合 70.22%。
+exp:
+  name: r1_r18
+  seed: 42
+  notes: "transfer learning, 48px, grayscale->RGB"
+
+data:
+  root: fer_data/fer_data
+  img_size: 96          # 迁移模型上采样到 96px，避免 7×7 步长卷积过早压缩
+  val_size: 2848
+  holdout_size: 2836
+  grayscale_to_rgb: true
+
+model:
+  name: resnet18
+  pretrained: true
+  dropout: 0.25
+  in_ch: 3
+
+train:
+  epochs: 20
+  batch_size: 128
+  lr: 0.0003
+  weight_decay: 0.001
+  warmup_epochs: 1
+  label_smoothing: 0.05
+  amp: true

@@ -1,0 +1,43 @@
+# 第十五轮：人脸领域预训练的 EfficientNet-B0（报告 9，E19）
+# 相同结构、六类分类头，载入 VGGFace2 身份识别权重（timm 0.9.16，本地固定文件）。
+# 与第十二轮融合 50/50 → 73.0337% / Macro F1 0.7120，提交 73.5%。
+# pretrained_path 指向本地权重文件；若只有 timm 名称，可设为 null 并使用 pretrained: true
+# 得到 ImageNet NoisyStudent 对照（同结构对照中 65.0411% vs 68.6357%）。
+exp:
+  name: r15_face_b0
+  seed: 20261011
+  notes: "efficientnet_b0 + VGGFace2, erasing, EMA 0.99, head lr x5"
+
+data:
+  root: fer_data/fer_data
+  img_size: 160
+  val_size: 2848
+  holdout_size: 0
+  grayscale_to_rgb: true
+
+aug:
+  erasing:
+    enabled: true
+    prob: 0.25
+    area: [0.02, 0.12]
+    ratio: [0.5, 2.0]
+
+model:
+  name: efficientnet_b0_face
+  pretrained: true
+  pretrained_path: null      # 例如 weights/vggface2_efficientnet_b0.pt
+  dropout: 0.2
+  head_lr_mult: 5.0
+  in_ch: 3
+
+train:
+  epochs: 32
+  batch_size: 64
+  lr: 0.00015
+  weight_decay: 0.02
+  warmup_epochs: 1
+  label_smoothing: 0.05
+  mixup_prob: 0.45
+  ema_decay: 0.99
+  amp: true
+  refit_epochs: 8

@@ -1,0 +1,31 @@
+# 第七轮：广义交叉熵 GCE（q=0.7，报告 5.3 / E06）
+# 用于标签噪声研究；6^q 缩放保证均匀预测处梯度尺度与交叉熵一致。
+# 结果：71.4185 / 71.4537 / 71.3132（三种正则化），未超过标准交叉熵。
+exp:
+  name: r7_gce
+  seed: 20261011
+  notes: "gce q=0.7, 6^q scaling"
+
+data:
+  root: fer_data/fer_data
+  img_size: 160
+  val_size: 2848
+  holdout_size: 0
+  grayscale_to_rgb: true
+
+model:
+  name: convnext_tiny
+  pretrained: true
+  dropout: 0.1
+  head_lr_mult: 10.0
+  in_ch: 3
+
+train:
+  epochs: 28
+  batch_size: 48
+  lr: 0.0001
+  weight_decay: 0.05
+  label_smoothing: 0.0
+  mixup_prob: 0.0
+  gce_q: 0.7
+  amp: true

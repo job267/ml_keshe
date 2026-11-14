@@ -1,0 +1,41 @@
+# 第十七轮：人脸预训练 ReXNet-1.5（报告 9.4，E21）
+# 匹配骨干张量、去除原头、新建六类分类头；保持 160px、头学习率 ×5、遮挡 0.25、EMA 0.99。
+# 与"现有融合"各 50% → 73.6306% / Macro F1 0.7183（2848 张中 2097 正确），提交待反馈。
+exp:
+  name: r17_rexnet
+  seed: 20261011
+  notes: "rexnet_150 + VGGFace2, erasing, EMA 0.99, head lr x5"
+
+data:
+  root: fer_data/fer_data
+  img_size: 160
+  val_size: 2848
+  holdout_size: 0
+  grayscale_to_rgb: true
+
+aug:
+  erasing:
+    enabled: true
+    prob: 0.25
+    area: [0.02, 0.12]
+    ratio: [0.5, 2.0]
+
+model:
+  name: rexnet_150
+  pretrained: true
+  pretrained_path: null      # VGGFace2 版 ReXNet-1.5 本地权重
+  dropout: 0.2
+  head_lr_mult: 5.0
+  in_ch: 3
+
+train:
+  epochs: 32
+  batch_size: 64
+  lr: 0.00015
+  weight_decay: 0.02
+  warmup_epochs: 1
+  label_smoothing: 0.05
+  mixup_prob: 0.45
+  ema_decay: 0.99
+  amp: true
+  refit_epochs: 8

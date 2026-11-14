@@ -1,0 +1,85 @@
+# ============================================================================
+# 阶段一：整图 -> 黄斑区域热力图 -> 中心凹粗坐标
+# 训练: python -m src.train --config configs/stage1.yaml --stage 1 --fold all
+#
+# 本配置是 fold-0 消融后的最优组合（见 README 第 6 节）：
+#   resnet50 + FPN(1/4 输出) + 强色彩增强   -> 验证 RMSE 16.1px
+#   对照：resnet18 无色彩增强 -> 53.6px；resnet18+色彩增强 -> 27.1px；
+#         resnet50 去掉 FPN(plain) -> 明显更差
+# ============================================================================
+task: stage1
+seed: 42
+
+data:
+  root: detection
+  gt_csv: detection/fovea_localization_train_GT.csv
+  sample_submission: detection/sample_submission.csv
+  img_size: [768, 512]        # 整图缩放尺寸 (W, H)。显存/速度不够可降到 [640, 428]
+  n_folds: 5                  # 5 折交叉验证；80 张图建议用 CV 而不是单次划分
+  fold: 0
+  num_workers: 4              # 受限环境(沙箱/无权限)会自动降级为 0
+  cache_mb: 400               # 每个进程的图像缓存上限（MB），80 张全缓存约占 360MB
+  decode_scale: 2             # 1=原图解码(慢), 2=1/2, 4=1/4
+
+# 眼底图的关键：中心凹的判据是"黄斑更暗、无血管"这个**亮度**特征，与颜色无关。
+# 所以色彩可以大胆扰动（不同相机/白平衡/染色差异巨大），亮度只做温和扰动。
+aug:
+  hflip: 0.5                  # 眼底图左右眼互为镜像，hflip 是合法增强
+  rotate: 8.0
+  scale: [0.92, 1.08]
+  translate: 0.03
+  brightness: 0.15            # 亮度扰动保持温和
+  contrast: 0.15
+  gamma: [0.8, 1.25]
+  hue: 0.03                   # HSV 色相 ±3% 整圈
+  saturation: [0.7, 1.3]      # HSV 饱和度缩放
+  channel_gain: 0.10          # RGB 三通道独立对数增益 σ（模拟白平衡/传感器差异）
+  illumination_p: 0.25        # 低频光照梯度（模拟照明不均/渐晕）
+  clahe_p: 0.20               # CLAHE 局部对比度
+  blur_p: 0.15
+  noise_p: 0.15
+
+model:
+  arch: fpn                   # fpn（多尺度融合，精度最高）| plain（无 FPN，明显更差）
+  backbone: resnet50          # resnet18 27.1px -> resnet50 16.1px（fold0, 60 epoch）
+  pretrained: true            # ImageNet 预训练，80 张图必须靠迁移学习
+  out_stride: 4               # 热力图相对输入的下采样倍率（只支持 2/4）
+  hidden: 128
+  use_coord_head: true
+  use_vis_head: false         # 训练集没有 (0,0) 样本，先关掉
+  coord_source: soft          # soft | head | mean
+  dropout: 0.0
+
+train:
+  epochs: 60                  # 余弦调度要跑满；60 时最佳仍在最后一轮，加到 100 还能再降
+  batch_size: 8
+  lr: 3.0e-4
+  backbone_lr_scale: 0.3
+  weight_decay: 1.0e-4
+  warmup_epochs: 5
+  amp: true
+  grad_clip: 1.0
+  ema_decay: 0.99             # 每 epoch 只有 8 步，衰减不能太大
+  patience: 40
+  eval_tta: true              # 验证/推理都开水平翻转 TTA
+  save_raw: false
+  save_last_every: 10
+  limit_batches: 0
+
+loss:
+  heatmap: mse
+  w_heatmap: 1.0
+  w_soft: 1.0
+  w_coord: 0.5
+  w_vis: 1.0
+  coord: smoothl1
+  smoothl1_beta: 0.01         # 归一化坐标单位，0.01 ≈ 30px
+  wing_w: 0.05
+  wing_e: 0.1
+
+heatmap:
+  sigma: 2.0                  # 高斯标签半径（热力图网格像素）
+  beta: 1.0                   # soft-argmax 锐化指数（1.0 = 标准积分回归）
+
+output:
+  dir: outputs

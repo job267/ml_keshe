@@ -1,0 +1,33 @@
+# 第二轮 A：ConvNeXt-Tiny，160px，28 轮（报告表 1）
+# 分类头学习率 ×10、标签平滑 0.04、MixUp p=0.35；开发验证 71.03% / Macro F1 0.6934。
+exp:
+  name: r2_convnext
+  seed: 20261011
+  notes: "convnext_tiny, 160px, head lr x10, ls 0.04, mixup 0.35"
+
+data:
+  root: fer_data/fer_data
+  img_size: 160
+  val_size: 2848
+  holdout_size: 0        # 第二轮起留出并入开发池 → 训练池 25,427
+  grayscale_to_rgb: true
+
+model:
+  name: convnext_tiny
+  pretrained: true
+  dropout: 0.1
+  head_lr_mult: 10.0
+  in_ch: 3
+
+train:
+  epochs: 28
+  batch_size: 48
+  lr: 0.0001
+  weight_decay: 0.05
+  warmup_epochs: 1
+  label_smoothing: 0.04
+  mixup_prob: 0.35
+  mixup_alpha: 0.2
+  amp: true
+  eval_tta_flip: true
+  refit_epochs: 8

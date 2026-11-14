@@ -1,0 +1,10 @@
+# 第十五轮融合（报告 9.2 / E19）：第十二轮三成员融合 50% + 人脸预训练 B0 50%
+# Accuracy 73.0337%、Macro F1 0.7120，较第十二轮 72.6124% 多判对 12 张；提交 73.5%。
+members:
+  - outputs/runs/r12_erasing      # 第十二轮遮挡 ConvNeXt（此处代表三成员融合的部署权重）
+  - outputs/runs/r15_face_b0
+weights: [0.50, 0.50]
+recorded_accuracy: 0.730337
+recorded_macro_f1: 0.7120
+kaggle: 0.735
+note: "二成员代理 OOF（只使用外折未见成员）为 70.1774%，不能冒充历史三成员融合的折外分数。"

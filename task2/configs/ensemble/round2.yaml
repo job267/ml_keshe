@@ -1,0 +1,13 @@
+# 第二轮融合（报告 4.2 / E07）：ResNet18 0.25 + ConvNeXt-Tiny 0.50 + EfficientNet-B0 0.25
+# 历史记录 72.4017% / Macro F1 0.7070；统一为 fp32 + 翻转 TTA 后 72.3315%。
+# 用法：
+#   python -m src.predict --runs outputs/runs/r2_r18 outputs/runs/r2_convnext outputs/runs/r2_b0 ^
+#       --weights 0.25 0.50 0.25 --split val --save-probs outputs/probs/r2_val.npz
+members:
+  - outputs/runs/r2_r18
+  - outputs/runs/r2_convnext
+  - outputs/runs/r2_b0
+weights: [0.25, 0.50, 0.25]
+recorded_accuracy: 0.724017
+reported_accuracy_fp32: 0.723315
+note: "单模型强弱与组合价值不等价：EfficientNet 单模型 68.47% 但贡献 +2.1 个百分点。"

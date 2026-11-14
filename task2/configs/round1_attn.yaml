@@ -1,0 +1,27 @@
+# 第一轮 B：注意力版本（报告 3.4）
+# 加宽通道、提高 Dropout、在残差分支加入通道重标定；误差降低但复杂度上升。
+exp:
+  name: r1_attn
+  seed: 42
+  notes: "SE 通道重标定，宽度×1.0，Dropout 0.3"
+
+data:
+  root: fer_data/fer_data
+  img_size: 48
+  val_size: 2848
+  holdout_size: 2836
+
+model:
+  name: ferresnet
+  pretrained: false
+  dropout: 0.30
+  se: true
+  in_ch: 1
+
+train:
+  epochs: 35
+  batch_size: 256
+  lr: 0.003
+  weight_decay: 0.0005
+  warmup_epochs: 1
+  amp: true

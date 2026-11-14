@@ -1,0 +1,10 @@
+# 第十二轮三成员融合（报告 6 / E16）：resnet18 0.25 + 遮挡 ConvNeXt 0.50 + EfficientNet 0.25
+# 开发验证 72.6124%；部署用全数据微调权重导出，Kaggle 72.8%。
+members:
+  - outputs/runs/r2_r18
+  - outputs/runs/r12_erasing
+  - outputs/runs/r2_b0
+weights: [0.25, 0.50, 0.25]
+recorded_accuracy: 0.726124
+kaggle: 0.728
+note: "三折 OOF 相对无遮挡对照提升 0.617 个百分点，三折方向一致后才进入后续主线。"

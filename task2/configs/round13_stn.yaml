@@ -1,0 +1,40 @@
+# 第十三轮：有界空间变换（报告 7.2，E17）
+# 在 ConvNeXt 前加 STN：旋转 ≤0.17 rad、各向同性缩放 ±10%、平移 ±0.1，
+# 单位变换初始化 + 反射填充。开发融合 72.7879%，但三折 OOF 下降（67.6604%），
+# 提交 72.7% 未超过第十二轮，因此后续主线**未采用**——保留配置以便复现该结论。
+exp:
+  name: r13_stn
+  seed: 20261011
+  notes: "bounded STN + erasing; negative result, kept for reproduction"
+
+data:
+  root: fer_data/fer_data
+  img_size: 160
+  val_size: 2848
+  holdout_size: 0
+  grayscale_to_rgb: true
+
+aug:
+  erasing:
+    enabled: true
+    prob: 0.25
+    area: [0.02, 0.12]
+    ratio: [0.5, 2.0]
+
+model:
+  name: convnext_tiny
+  pretrained: true
+  dropout: 0.1
+  head_lr_mult: 10.0
+  stn: true
+  in_ch: 3
+
+train:
+  epochs: 28
+  batch_size: 48
+  lr: 0.0001
+  weight_decay: 0.05
+  warmup_epochs: 1
+  label_smoothing: 0.04
+  mixup_prob: 0.35
+  amp: true

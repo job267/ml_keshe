@@ -1,0 +1,39 @@
+{
+  "sources": [
+    {
+      "file": "vendor/fr_unet.py",
+      "upstream_url": "https://github.com/lseventeen/FR-UNet/blob/master/models/fr_unet.py",
+      "upstream_git_blob_sha": "bc464f5fe3e125f43c5327cd0ec51e5ecce6143d",
+      "changes": "relative utils import; instantiate InitWeights_He before Module.apply"
+    },
+    {
+      "file": "vendor/fr_utils.py",
+      "upstream_url": "https://github.com/lseventeen/FR-UNet/blob/master/models/utils.py",
+      "upstream_git_blob_sha": "ab1d8a6f80531df32cd8e4e5d1c055e2212c58a2",
+      "changes": "replace timm trunc_normal_ import with torch.nn.init.trunc_normal_"
+    },
+    {
+      "file": "vendor/FR_UNet_LICENSE",
+      "upstream_url": "https://github.com/lseventeen/FR-UNet/blob/master/LICENSE",
+      "upstream_git_blob_sha": "dc073ec2372fe95b14e3756ca6fa7d1154f6ff20",
+      "changes": "none"
+    },
+    {
+      "file": "vendor/dsconv.py",
+      "upstream_url": "https://github.com/YaoleiQi/DSCNet/blob/main/DSCNet_2D_opensource/Code/DRIVE/S3_DSConv_pro.py",
+      "upstream_git_blob_sha": "82795e34e7882ae78782b7bfcab2f00fce05470c",
+      "changes": "native PyTorch repeat/permute/reshape replaces einops; coordinates follow input device"
+    },
+    {
+      "file": "vendor/DSCNet_LICENSE",
+      "upstream_url": "https://github.com/YaoleiQi/DSCNet/blob/main/LICENSE",
+      "upstream_git_blob_sha": "d916a9698fda6efbaf7c855d4f0598595e06d10e",
+      "changes": "none"
+    }
+  ],
+  "adaptations": [
+    "FR-UNet: use an InitWeights_He instance as intended by nn.Module.apply; torch native initialization import",
+    "DSConv: equivalent repeat/permute/reshape expressions replace einops; coordinates follow input device",
+    "DSConv network integration is an identity-initialized local adapter, not a full DSCNet reproduction"
+  ]
+}
